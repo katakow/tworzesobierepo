@@ -24,7 +24,7 @@ epochs = 3
 initial_learning_rate = 0.7
 
 # %% source image
-image_location = "C:\\git\\tworzesobierepo\\data\\kwadrat.png"
+image_location = "C:\\git\\tworzesobierepo\\data\\lew.png"
 image = cv2.imread(image_location, cv2.IMREAD_GRAYSCALE)
 
 
@@ -57,7 +57,7 @@ for i in range(0, image_height, block_height):
 image_vectors = np.asarray(image_vectors).astype(float)
 number_of_image_vectors = image_vectors.shape[0]
 
-# %% properties of the SOM grid
+# %% train som
 som_rows = int(pow(2, int((log(codebook_size, 2)) / 2)))
 som_columns = int(codebook_size / som_rows)
 
@@ -74,15 +74,22 @@ reconstruction_values = som.train(image_vectors)
 
 image_vector_indices, distance = vq(image_vectors, reconstruction_values)
 
-image_after_compression = np.zeros([image_width, image_height], dtype="uint8")
+# %% save image
+
+image_after_compression = np.zeros([image_height, image_width], dtype="uint8")
 for index, image_vector in enumerate(image_vectors):
     start_row = int(index / (image_width / block_width)) * block_height
-    end_row = start_row + block_height
+    end_row = min(start_row + block_height, image_height)
     start_column = (index * block_width) % image_width
-    end_column = start_column + block_width
-    image_after_compression[start_row:end_row, start_column:end_column] = np.reshape(
+    end_column = min(start_column + block_width, image_width)
+
+    pixels = np.reshape(
         reconstruction_values[image_vector_indices[index]], (block_width, block_height)
     )
+    print(end_row, end_column)
+    image_after_compression[start_row:end_row, start_column:end_column] = pixels[
+        : end_row - start_row, : end_column - start_column
+    ]
 
 output_image_name = "CB_size=" + str(codebook_size) + ".png"
 # %% scipy.misc.imsave(output_image_name, image_after_compression)
