@@ -24,14 +24,26 @@ epochs = 3
 initial_learning_rate = 0.7
 
 # %% source image
-image_location = "C:\\git\\tworzesobierepo\\data\\lenna.png"
+image_location = "C:\\git\\tworzesobierepo\\data\\kwadrat.png"
 image = cv2.imread(image_location, cv2.IMREAD_GRAYSCALE)
+
 
 print(type(image))
 
 image_height = len(image)
 image_width = len(image[0])
+image_height
+image_width
 
+# %% resize
+max_height = int(int(image_height / block_height) * block_height)
+max_width = int(int(image_width / block_width) * block_width)
+
+image = image[:max_height, :max_width]
+image_height = len(image)
+image_width = len(image[0])
+image_height
+image_width
 
 # %% dividing the image into 4*4 blocks of pixels
 image_vectors = []
@@ -76,3 +88,5 @@ output_image_name = "CB_size=" + str(codebook_size) + ".png"
 # %% scipy.misc.imsave(output_image_name, image_after_compression)
 imageio.imsave(output_image_name, image_after_compression)
 print("Mean Square Error = ", mse(image, image_after_compression))
+
+# %%
